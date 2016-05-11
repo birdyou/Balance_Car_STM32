@@ -526,7 +526,7 @@ typedef struct
 /* SDIO RESP Registers Address */
 #define SDIO_RESP_ADDR           ((uint32_t)(SDIO_BASE + 0x14))
 
-/* SDIO Initialization Frequency (400KHz max) */
+/* SDIO Initialization Frequency (400KHz max)D0  76*/
 #define SDIO_INIT_CLK_DIV ((uint8_t)0x76)
 
 /* SDIO Data Transfer Frequency (25MHz max) */

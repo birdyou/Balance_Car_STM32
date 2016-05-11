@@ -42,7 +42,9 @@
 #include "debug.h"
 #include "x_nucleo_iks01a1.h"
 #include "imu_sensor.h"
-
+#include "cmsis_os.h"
+#include "control.h"
+#include "x_nucleo_cca01m1_audio_f4.h"
 #if NO_PRINTF
 #define printf(...)
 #endif
@@ -52,7 +54,9 @@ extern RTC_HandleTypeDef RTCHandle;
 /** @addtogroup X-CUBE-BLE1_Applications
  *  @{
  */
-
+#ifdef I2C_DMA_MODE
+extern I2C_HandleTypeDef    I2C_EXPBD_Handle;
+#endif
 /** @addtogroup SensorDemo
  *  @{
  */
@@ -98,14 +102,6 @@ void HardFault_Handler(void)
     }
 }
 
-/**
-  * @brief  SVC_Handler This function handles SVCall exception.
-  * @param  None
-  * @retval None
-  */
-void SVC_Handler(void)
-{
-}
 
 /**
   * @brief  DebugMon_Handler This function handles Debug Monitor exception.
@@ -116,14 +112,28 @@ void DebugMon_Handler(void)
 {
 }
 
+
 /**
-  * @brief  PendSV_Handler This function handles PendSVC exception.
+  * @brief  This function handles DMA2 Stream 3 interrupt request.
   * @param  None
   * @retval None
   */
-void PendSV_Handler(void)
+void DMA2_Stream3_IRQHandler(void)
 {
+  BSP_SD_DMA_Rx_IRQHandler();
 }
+
+/**
+  * @brief  This function handles DMA2 Stream 6 interrupt request.
+  * @param  None
+  * @retval None
+  */
+
+void DMA2_Stream6_IRQHandler(void)
+{
+  BSP_SD_DMA_Tx_IRQHandler(); 
+}
+
 
 /**
   * @brief  SysTick_Handler This function handles SysTick Handler.
@@ -135,6 +145,7 @@ void SysTick_Handler(void)
     HAL_IncTick();
 
     ms_counter++;
+	osSystickHandler();
 }
 
 
@@ -145,14 +156,31 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
 
+
+
+
 /**
   * @brief  This function handles External line interrupt request for BlueNRG.
   * @param  None
   * @retval None
   */
+
+
 void BNRG_SPI_EXTI_IRQHandler(void)
 {
+	
+	
     HAL_GPIO_EXTI_IRQHandler(BNRG_SPI_EXTI_PIN);
+}
+/**
+  * @brief  This function handles DMA Stream interrupt request for First Device.
+  * @param  None
+  * @retval None
+  */
+void AUDIO_OUT1_I2S_IRQHandler(void)
+{
+
+  HAL_DMA_IRQHandler(hAudioOutI2s[0].hdmatx);
 }
 
 
@@ -204,17 +232,34 @@ void PPP_IRQHandler(void)
 {
 }
 */
+extern osSemaphoreId osSemaphore_MWMS_EXTI;		//用于中断的信号量
 #ifdef SENSOR_FIFO
 /*lsm6ds3*/
 void EXTI0_IRQHandler(void)
 {
+	//static portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
    if(__HAL_GPIO_EXTI_GET_IT(MEMS_INT1_PIN) != RESET)
   {
     __HAL_GPIO_EXTI_CLEAR_IT(MEMS_INT1_PIN);
-    
+   // Car_Control();
+		//osSemaphoreRelease(osSemaphore);
+
+	
+//	if(xSemaphoreGiveFromISR( osSemaphore_MWMS_EXTI, &xHigherPriorityTaskWoken )==1){
+//	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+//	}
+		imu_sensor_read_data_from_fifo_DMA();
 //    imu_sensor_read_data_from_fifo();
 //    printf("fifo interrupt \n");
   }
+}
+#endif
+
+#ifdef I2C_DMA_MODE
+//#ifdef I2C_DMA_MODE
+void DMA_STREAM_IRQHANDLER(void)
+{
+    HAL_DMA_IRQHandler(I2C_EXPBD_Handle.hdmarx);         
 }
 #endif
 

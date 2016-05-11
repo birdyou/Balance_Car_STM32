@@ -423,6 +423,51 @@
               <FileType>1</FileType>
               <FilePath>..\function.c</FilePath>
             </File>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\ffconf.h</FilePath>
+            </File>
+            <File>
+              <FileName>FreeRTOSConfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\FreeRTOSConfig.h</FilePath>
+            </File>
+            <File>
+              <FileName>imu_sensor_fusion_9-axis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\imu_sensor_fusion_9-axis.c</FilePath>
+            </File>
+            <File>
+              <FileName>control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\control.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu_sensor_fusion.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\juma\src\imu_sensor_fusion.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_application.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\audio_application.c</FilePath>
+            </File>
+            <File>
+              <FileName>waveplayer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\waveplayer.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl6180x_application.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\vl6180x_application.c</FilePath>
+            </File>
+            <File>
+              <FileName>motion.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\motion.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -474,9 +519,9 @@
               <FilePath>..\..\..\..\system\juma\src\imu_sensor.c</FilePath>
             </File>
             <File>
-              <FileName>imu_sensor_fusion.c</FileName>
+              <FileName>juma_sensor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\system\juma\src\imu_sensor_fusion.c</FilePath>
+              <FilePath>..\..\..\..\system\juma\src\juma_sensor.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -639,11 +684,6 @@
               <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_ll_usb.c</FilePath>
             </File>
             <File>
-              <FileName>list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\system\drivers\bluenrg\src\list.c</FilePath>
-            </File>
-            <File>
               <FileName>osal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\drivers\bluenrg\src\osal.c</FilePath>
@@ -687,6 +727,46 @@
               <FileName>stm32_bluenrg_ble.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\drivers\bluenrg\bluenrg_ms\stm32_bluenrg_ble.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_hal_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_ll_sdmmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_ll_sdmmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\bluenrg\src\list.c</FilePath>
+            </File>
+            <File>
+              <FileName>sta350bw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\sta350bw\sta350bw.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_i2s.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_hal_i2s.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_i2s_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_hal_i2s_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl6180x_api.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\vl6180x\vl6180x_api.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl6180x_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\vl6180x\vl6180x_i2c.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -771,6 +851,26 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\bsp\cannon_v2\stm32f4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32469i_discovery_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\cannon_v2\stm32469i_discovery_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>x_nucleo_cca01m1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\nucleo\x_nucleo_cca01m1.c</FilePath>
+            </File>
+            <File>
+              <FileName>x_nucleo_cca01m1_audio_f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\nucleo\x_nucleo_cca01m1_audio_f4.c</FilePath>
+            </File>
+            <File>
+              <FileName>x-nucleo-6180xa1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\nucleo\x-nucleo-6180xa1.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -785,6 +885,91 @@
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\cmiss\device\st\src\system_stm32f4xx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>system/Fatfs</GroupName>
+          <Files>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff_gen_drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\ff_gen_drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\drivers\sd_diskio.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>system/FreeRTOS</GroupName>
+          <Files>
+            <File>
+              <FileName>cmsis_os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</FilePath>
+            </File>
+            <File>
+              <FileName>croutine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\croutine.c</FilePath>
+            </File>
+            <File>
+              <FileName>queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\tasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>timers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\timers.c</FilePath>
+            </File>
+            <File>
+              <FileName>heap_4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
+            </File>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\portable\RVDS\ARM_CM4F\port.c</FilePath>
+            </File>
+            <File>
+              <FileName>OS_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\OS_list.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>system/BiquadCalculator</GroupName>
+          <Files>
+            <File>
+              <FileName>BiquadCalculator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\BiquadCalculator\BiquadCalculator.c</FilePath>
+            </File>
+            <File>
+              <FileName>BiquadPresets.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\BiquadCalculator\BiquadPresets.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1150,9 +1335,9 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--C99 --gnu </MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F401xE,USE_STM32F4XX_NUCLEO,ENABLE_SPI_FIX,BLUENRG_MS,RTC_LSE,CANNON_V2,SENSOR_FIFO,NO_PRINTF</Define>
+              <Define>USE_HAL_DRIVER,STM32F401xE,USE_STM32F4XX_NUCLEO,ENABLE_SPI_FIX,BLUENRG_MS,RTC_LSE,CANNON_V2,SENSOR_FIFO,NO_PRINTF,I2C_DMA_MODE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\system\drivers\hts221;..\..\..\..\system\drivers\lps25h;..\..\..\..\system\drivers\lps25hb;..\..\..\..\system\drivers\lsm303agr;..\..\..\..\system\drivers\lsm6ds3;..\..\..\..\system\drivers\stm32f4xx_hal_driver\inc;..\..\..\..\system\drivers\common;..\..\..\..\system\drivers\bluenrg\inc;..\..\..\..\system\drivers\bluenrg\bluenrg_ms;..\..\..\..\system\bsp\nucleo;..\..\..\..\system\bsp\cannon_v2;..\..\..\..\system\juma\inc;..\..\..\..\system\cmiss\device\st\inc;..\..\..\..\system\cmiss\include;..\..\balance_car</IncludePath>
+              <IncludePath>..\..\..\..\system\drivers\hts221;..\..\..\..\system\drivers\lps25h;..\..\..\..\system\drivers\lps25hb;..\..\..\..\system\drivers\lsm303agr;..\..\..\..\system\drivers\lsm6ds3;..\..\..\..\system\drivers\stm32f4xx_hal_driver\inc;..\..\..\..\system\drivers\common;..\..\..\..\system\drivers\bluenrg\inc;..\..\..\..\system\drivers\bluenrg\bluenrg_ms;..\..\..\..\system\bsp\nucleo;..\..\..\..\system\bsp\cannon_v2;..\..\..\..\system\juma\inc;..\..\..\..\system\cmiss\device\st\inc;..\..\..\..\system\cmiss\include;..\..\balance_car;..\..\..\..\system\FatFs\src;..\..\..\..\system\FatFs\src\drivers;..\..\..\..\system\FreeRTOS\Source\portable\RVDS\ARM_CM4F;..\..\..\..\system\FreeRTOS\Source\include;..\..\..\..\system\FreeRTOS\Source\CMSIS_RTOS;..\..\..\..\system\BiquadCalculator;..\..\..\..\system\drivers\sta350bw;..\..\..\..\system\drivers\vl6180x</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1210,6 +1395,51 @@
               <FileType>1</FileType>
               <FilePath>..\function.c</FilePath>
             </File>
+            <File>
+              <FileName>ffconf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\ffconf.h</FilePath>
+            </File>
+            <File>
+              <FileName>FreeRTOSConfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\FreeRTOSConfig.h</FilePath>
+            </File>
+            <File>
+              <FileName>imu_sensor_fusion_9-axis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\imu_sensor_fusion_9-axis.c</FilePath>
+            </File>
+            <File>
+              <FileName>control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\control.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu_sensor_fusion.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\juma\src\imu_sensor_fusion.c</FilePath>
+            </File>
+            <File>
+              <FileName>audio_application.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\audio_application.c</FilePath>
+            </File>
+            <File>
+              <FileName>waveplayer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\waveplayer.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl6180x_application.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\vl6180x_application.c</FilePath>
+            </File>
+            <File>
+              <FileName>motion.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\motion.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1261,9 +1491,9 @@
               <FilePath>..\..\..\..\system\juma\src\imu_sensor.c</FilePath>
             </File>
             <File>
-              <FileName>imu_sensor_fusion.c</FileName>
+              <FileName>juma_sensor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\system\juma\src\imu_sensor_fusion.c</FilePath>
+              <FilePath>..\..\..\..\system\juma\src\juma_sensor.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1426,11 +1656,6 @@
               <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_ll_usb.c</FilePath>
             </File>
             <File>
-              <FileName>list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\system\drivers\bluenrg\src\list.c</FilePath>
-            </File>
-            <File>
               <FileName>osal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\drivers\bluenrg\src\osal.c</FilePath>
@@ -1474,6 +1699,46 @@
               <FileName>stm32_bluenrg_ble.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\drivers\bluenrg\bluenrg_ms\stm32_bluenrg_ble.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_hal_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_ll_sdmmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_ll_sdmmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\bluenrg\src\list.c</FilePath>
+            </File>
+            <File>
+              <FileName>sta350bw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\sta350bw\sta350bw.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_i2s.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_hal_i2s.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_i2s_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\stm32f4xx_hal_driver\src\stm32f4xx_hal_i2s_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl6180x_api.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\vl6180x\vl6180x_api.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl6180x_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\drivers\vl6180x\vl6180x_i2c.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1558,6 +1823,26 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\bsp\cannon_v2\stm32f4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32469i_discovery_sd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\cannon_v2\stm32469i_discovery_sd.c</FilePath>
+            </File>
+            <File>
+              <FileName>x_nucleo_cca01m1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\nucleo\x_nucleo_cca01m1.c</FilePath>
+            </File>
+            <File>
+              <FileName>x_nucleo_cca01m1_audio_f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\nucleo\x_nucleo_cca01m1_audio_f4.c</FilePath>
+            </File>
+            <File>
+              <FileName>x-nucleo-6180xa1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\bsp\nucleo\x-nucleo-6180xa1.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1572,6 +1857,91 @@
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\system\cmiss\device\st\src\system_stm32f4xx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>system/Fatfs</GroupName>
+          <Files>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff_gen_drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\ff_gen_drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>sd_diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FatFs\src\drivers\sd_diskio.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>system/FreeRTOS</GroupName>
+          <Files>
+            <File>
+              <FileName>cmsis_os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</FilePath>
+            </File>
+            <File>
+              <FileName>croutine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\croutine.c</FilePath>
+            </File>
+            <File>
+              <FileName>queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\tasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>timers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\timers.c</FilePath>
+            </File>
+            <File>
+              <FileName>heap_4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
+            </File>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\portable\RVDS\ARM_CM4F\port.c</FilePath>
+            </File>
+            <File>
+              <FileName>OS_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\FreeRTOS\Source\OS_list.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>system/BiquadCalculator</GroupName>
+          <Files>
+            <File>
+              <FileName>BiquadCalculator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\BiquadCalculator\BiquadCalculator.c</FilePath>
+            </File>
+            <File>
+              <FileName>BiquadPresets.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\system\BiquadCalculator\BiquadPresets.c</FilePath>
             </File>
           </Files>
         </Group>

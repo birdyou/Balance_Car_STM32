@@ -1,10 +1,21 @@
 #include "imu_sensor.h"
-#include "app.h"
+
 
 #if NO_PRINTF
 #define printf(...)
 #endif
+#define LSM6DS3_THRESHOLD
+#define LSM6DS3_SOFT_RESET
+#define LSM6DS3_CLEAR_FIFO
+IMU_Offset MyOffset={0,0,0,
+										42,-43,-32,
+								//		0,0,0};
+									150,115,175};
+uint8_t isCalib=0;
+//extern IMU_Offset MyOffset;
 
+ float quat[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+ 
 static sensor_selsection_t sensor_selection;
 static imu_sensor_data_sensitivity_t sensor_data_sensitivity;
 static sensor_data_read_param_t sensor_data_param;
@@ -32,8 +43,9 @@ static imu_status_t  imu_sensor_gyro_get_sensitivity( float *pfData );
 static imu_status_t imu_sensor_clear_fifo(void);
 #endif
 static imu_status_t imu_sensor_fifo_data_number(uint16_t* number);
-static imu_status_t imu_sensor_read_sensor_rate_config(uint8_t number);
-static void imu_sensor_read_fifo_delay(void);
+
+static uint16_t imu_sensor_get_fifo_datalength(void);
+
 
 /*reset sensors*/
 imu_status_t imu_sensor_reset(void)
@@ -44,10 +56,34 @@ imu_status_t imu_sensor_reset(void)
         printf("lsm6ds3 io init error\n");
         return imu_status_fail;
     }
+
     /* Configure interrupt lines */
     LSM6DS3_IO_ITConfig();
     printf("IT IO Config\n");
 
+// imu_sensor_clear_fifo();
+  /*soft reset*/
+  if (imu_sensor_lsm6ds3_soft_reset() != imu_status_ok)
+  {
+    printf("lsm6ds3 reset error\n");
+    return imu_status_fail;
+  }
+
+  //printf("sensor reset\n");
+
+  /*clear fifo data*/
+  imu_sensor_clear_fifo();
+
+		  /*set fifo water mark level*/
+  if (imu_sensor_fifo_threshold_level(6) != imu_status_ok) { 
+    printf("sensor fifo water mark setting error\n");
+    return imu_status_fail;
+  }
+		
+		if (imu_sensor_fifo_threshold_interrupt() != imu_status_ok ) {
+    printf("sensor fifo interrupt setting error\n");
+   return imu_status_fail;
+  }
     if(lsm6ds3_fifo_sensor_enable() != imu_status_ok)
     {
         printf("sensor fifoenable error\n");
@@ -61,11 +97,8 @@ imu_status_t imu_sensor_reset(void)
 /*active sensor*/
 imu_status_t imu_sensor_select_features(sensor_selsection_t features)
 {
-
     sensor_selection = features;
-
     printf("sensor features : %x\n", sensor_selection);
-
     return imu_status_ok;
 }
 
@@ -119,7 +152,7 @@ imu_status_t imu_sensor_set_data_rate(uint32_t* p_data_rate, uint8_t mode)
 
         /* FIFO mode selection */
         tmp1 &= ~(LSM6DS3_XG_FIFO_MODE_MASK);
-        tmp1 |= LSM6DS3_XG_FIFO_MODE_FIFO;
+        tmp1 |= mode;
 
         if(LSM6DS3_IO_Write(&tmp1, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_CTRL5, 1) != imu_status_ok)
         {
@@ -138,6 +171,7 @@ imu_status_t imu_sensor_set_data_rate(uint32_t* p_data_rate, uint8_t mode)
                   : ( * p_data_rate <= 416  )  ? LSM6DS3_XL_ODR_416HZ
                   : ( * p_data_rate <= 833  )  ? LSM6DS3_XL_ODR_833HZ
                   :                          LSM6DS3_XL_ODR_1660HZ;
+			
         if(sensor_selection & ACC_ENABLE) {
 
             if(imu_sensor_config_acc(new_odr, LSM6DS3_XL_FS_2G) != imu_status_ok) {
@@ -147,7 +181,7 @@ imu_status_t imu_sensor_set_data_rate(uint32_t* p_data_rate, uint8_t mode)
         }
         if(sensor_selection & GYRO_ENABLE) {
 
-            if(imu_sensor_config_gyro(new_odr, LSM6DS3_G_FS_125_ENABLE) != imu_status_ok) {
+            if(imu_sensor_config_gyro(new_odr, LSM6DS3_G_FS_2000) != imu_status_ok) {
                 return imu_status_fail;
             }
         }
@@ -166,7 +200,26 @@ imu_status_t imu_sensor_set_data_rate(uint32_t* p_data_rate, uint8_t mode)
 
     return imu_status_ok;
 }
+imu_status_t imu_sensor_filter(void){
+	 uint8_t tmp1 = 0x00;
+	
+				tmp1 &= ~(0x10);
+        tmp1 |= 0x10;
 
+        if(LSM6DS3_IO_Write(&tmp1, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_TAP_CFG, 1) != imu_status_ok)
+        {
+            return imu_status_fail;
+        }
+	 /* LPF2_XL_EN Accelerometer low-pass filter LPF2 selection*/
+        tmp1 &= ~(0x84);
+        tmp1 |= 0x84;
+
+        if(LSM6DS3_IO_Write(&tmp1, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_CTRL8_XL, 1) != imu_status_ok)
+        {
+            return imu_status_fail;
+        }
+				return imu_status_ok;
+}
 /*start get sensor data*/
 imu_status_t imu_sensor_start(void)
 {
@@ -197,8 +250,8 @@ imu_status_t imu_sensor_start(void)
         }
         printf("mag output enable\n");
     }
-    imu_sensor_read_sensor_rate_config(60);
-    imu_sensor_read_data_from_fifo(NULL);
+    //imu_sensor_read_sensor_rate_config(60);
+   // imu_sensor_read_data_from_fifo(NULL);
 
     return imu_status_ok;
 }
@@ -424,94 +477,223 @@ static imu_status_t imu_sensor_gyro_output_status_config(uint8_t status)
     return imu_status_ok;
 }
 /*config read fifo group number*/
-static imu_status_t imu_sensor_read_sensor_rate_config(uint8_t number)
-{
-    sensor_data_param.group_number = number * 2;
 
-    return imu_status_ok;
-}
-
-static void imu_sensor_read_fifo_delay(void)
-{
-    uint16_t fifo_remain_number;
-    uint16_t  remain_group;
- 
-    if( imu_sensor_fifo_data_number(&fifo_remain_number) != imu_status_ok)
-    {
-        return;
-    }
-    printf("fifo_remain_number :%d\n", fifo_remain_number);
-    remain_group = fifo_remain_number / 6;
-    if(remain_group > sensor_data_param.group_number){
-        sensor_data_param.delay_time = 0;
-    }else{
-        sensor_data_param.delay_time = ((sensor_data_param.group_number - remain_group) / 2) * (1000 / sensor_data_param.sample_rate);
-    }
-}
 
 /*fifo read*/
-void imu_sensor_read_data_from_fifo(void* arg)
+int  fifo_length ;
+ 
+imu_status_t imu_sensor_read_data_from_fifo(imu_sensor_raw_data_t* Sensor_Raw_Data,imu_sensor_data_t* Sensor_Data,imu_euler_data_t* Sensor_Euler_Angle)
 {
-    int16_t pData[3] = {0};
-    uint8_t tempReg[2] = {0, 0}, number;
-    sensor_data_type_t flag;
-    imu_sensor_data_t sensor_data = {0.0,0.0,0.0};
-
-    flag = TYPE_GYRO_DATA;
-    /*mag data*/
-    if(LSM303AGR_MAG_Get_Magnetic(sensor_data.mag) != imu_status_ok)
+  
+  int16_t pData[12] = {0};
+  uint8_t tempReg[12] = {0, 0};
+	static float coef = (3.141592/180.0);
+  static imu_sensor_data_t sensor_data = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+	static imu_sensor_raw_data_t sensor_raw_data={0,0,0,0,0,0,0,0,0};
+	static imu_euler_data_t euler_angle={0,0,0};
+	int16_t M_RAW_Data[3];
+ 
+ 
+ /*
+    if (LSM303AGR_MAG_Get_Raw_Magnetic((u8_t*)M_RAW_Data)!= imu_status_ok)
     {
-        printf("read sensor error\n");
-        return ;
+      printf("read sensor error\n");
+      return imu_status_fail;
     }
-
-    number = sensor_data_param.group_number;
-    while(number > 0) {
-
-        if(LSM6DS3_IO_Read(&tempReg[0], LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_DATA_OUT_L, 2) != imu_status_ok)
-        {
-            printf("read sensor error\n");
-            return ;
-        }
-        pData[0] = ((((int16_t)tempReg[1]) << 8) + (int16_t)tempReg[0]);
-
-        if(LSM6DS3_IO_Read(&tempReg[0], LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_DATA_OUT_L, 2) != imu_status_ok)
-        {
-            printf("read sensor error\n");
-            return ;
-        }
-
-        pData[1] = ((((int16_t)tempReg[1]) << 8) + (int16_t)tempReg[0]);
-
-        if(LSM6DS3_IO_Read(&tempReg[0], LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_DATA_OUT_L, 2) != imu_status_ok)
-        {
-            printf("read sensor error\n");
-            return ;
-        }
-
-        pData[2] = ((((int16_t)tempReg[1]) << 8) + (int16_t)tempReg[0]);
-
-        if(flag == TYPE_GYRO_DATA) {
-            /*gyro data*/
-            sensor_data.gyro[0] = (float)((pData[0] * sensor_data_sensitivity.gyro_sensitivity)/1000);
-            sensor_data.gyro[1] = (float)((pData[1] * sensor_data_sensitivity.gyro_sensitivity)/1000);
-            sensor_data.gyro[2] = (float)((pData[2] * sensor_data_sensitivity.gyro_sensitivity)/1000);
-            flag = TYPE_ACC_DATA;
-        } else if (flag == TYPE_ACC_DATA) {
-
-            /*acc data*/
-            sensor_data.acc[0] = (float)(pData[0] * sensor_data_sensitivity.acc_sensitivity);
-            sensor_data.acc[1] = (float)(pData[1] * sensor_data_sensitivity.acc_sensitivity);
-            sensor_data.acc[2] = (float)(pData[2] * sensor_data_sensitivity.acc_sensitivity);
-            on_imu_sensor_data(&sensor_data);
-            flag = TYPE_GYRO_DATA;
-        }
-
-        number--;
+		*/
+   fifo_length = imu_sensor_get_fifo_datalength();
+  printf("~~~%d\n", fifo_length);
+	if(fifo_length>=6){
+		for (uint16_t n = 0; n < fifo_length % 6; n++) {
+		//	bad_value++;
+   printf("~~ the last %d\n", fifo_length % 6);
+    if (LSM6DS3_IO_Read(tempReg, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_DATA_OUT_L, 2) != imu_status_ok)
+    {
+      printf("read sensor error\n");
+      return imu_status_fail;
     }
-    
-    imu_sensor_read_fifo_delay();
-    run_after_delay(imu_sensor_read_data_from_fifo, NULL, sensor_data_param.delay_time);
+		//maydata[0]= ((((int16_t)tempReg[1]) << 8) + (int16_t)tempReg[0]);
+		}
+  for (uint16_t n = 0; n < fifo_length / 6; n++) {
+    printf("~~ the sensor %d\n", fifo_length / 6);
+    if (LSM6DS3_IO_Read(tempReg, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_DATA_OUT_L, 12) != imu_status_ok)
+    {
+      printf("read sensor error\n");
+      return imu_status_fail;
+    }
+		
+		for (int i = 0; i < 6; i++) {
+    pData[i] = ((((int16_t)tempReg[i * 2 + 1]) << 8) + (int16_t)tempReg[i * 2]);
+  }
+		
+	
+	
+	
+  sensor_data.gyro[0] = -((float)(pData[0]-MyOffset.G_X)   / 32768 * 2000 );
+  sensor_data.gyro[1] = ((float)(pData[1]-MyOffset.G_Y) / 32768 * 2000 );
+  sensor_data.gyro[2] = -((float)(pData[2]-MyOffset.G_Z)  / 32768 * 2000 );
+
+  sensor_data.acc[0] = -(float)pData[3];
+  sensor_data.acc[1] = (float)pData[4] ;
+  sensor_data.acc[2] = -(float)pData[5] ;
+	
+	sensor_data.mag[0] = -(float)(M_RAW_Data[0]-MyOffset.M_X);
+  sensor_data.mag[1] = (float)(M_RAW_Data[1]-MyOffset.M_Y);
+  sensor_data.mag[2] = -(float)(M_RAW_Data[2]-MyOffset.M_Z);
+	
+	//MadgwickAHRSupdate(quat, 1.0f/400,sensor_data.gyro[0]*coef,sensor_data.gyro[1]*coef,sensor_data.gyro[2]*coef,sensor_data.acc[0],sensor_data.acc[1],sensor_data.acc[2],sensor_data.mag[1]*-1,sensor_data.mag[0]*-1,sensor_data.mag[2]);
+//MadgwickAHRSupdate(quat, 1.0f/400,sensor_data.gyro[0]*coef,sensor_data.gyro[1]*coef,sensor_data.gyro[2]*coef,sensor_data.acc[0],sensor_data.acc[1],sensor_data.acc[2],0,0,0);
+	
+//MahonyAHRSupdate(quat, 1.0f/400,sensor_data.gyro[0]*coef,sensor_data.gyro[1]*coef,sensor_data.gyro[2]*coef,sensor_data.acc[0],sensor_data.acc[1],sensor_data.acc[2],sensor_data.mag[1]*-1,sensor_data.mag[0]*-1,sensor_data.mag[2]);
+	MahonyAHRSupdate(quat, 1.0f/833,sensor_data.gyro[0]*coef,sensor_data.gyro[1]*coef,sensor_data.gyro[2]*coef,sensor_data.acc[0],sensor_data.acc[1],sensor_data.acc[2],0,0,0);
+	
+  }
+	sensor_raw_data.gyro[0]=pData[0];
+	sensor_raw_data.gyro[1]=pData[1];
+	sensor_raw_data.gyro[2]=pData[2];
+	sensor_raw_data.acc[0]=pData[3];
+  sensor_raw_data.acc[1]=	pData[4];
+	sensor_raw_data.acc[2]=pData[5];
+	sensor_raw_data.mag[0] =M_RAW_Data[0];
+	sensor_raw_data.mag[1] =M_RAW_Data[1];
+	sensor_raw_data.mag[2] =M_RAW_Data[2];
+	
+  euler_angle.pitch = atan2(2 *(quat[2] * quat[3] + quat[0] * quat[1]) , quat[0] * quat[0] -quat[1] * quat[1] -quat[2] * quat[2] + quat[3] * quat[3])*57.295646; 
+	euler_angle.roll=asin(-2*(quat[1]*quat[3]-quat[0]*quat[2]))*57.295646;
+	euler_angle.yaw=atan2(2*(quat[1] * quat[2] + quat[0] * quat[3]) , quat[0] * quat[0] +quat[1] * quat[1] -quat[2] * quat[2] - quat[3] * quat[3])*57.295646; 
+	*Sensor_Data=sensor_data;
+	*Sensor_Raw_Data=sensor_raw_data;
+	*Sensor_Euler_Angle=euler_angle;
+	
+	return imu_status_ok;
+	}
+	return imu_status_fail;
+}
+int16_t pData_sensor[12] = {0};
+  uint8_t tempReg_sensor[14] = {0, 0};
+extern imu_sensor_raw_data_t sensor_saw_data;//IMU和磁力计原始值
+extern	imu_sensor_data_t sensor_data;//校准转换后的值，Offset见MyOffset参数
+	extern imu_euler_data_t sensor_euler_angle;//欧拉角
+extern	uint16_t MData[3];
+	void get_euler(void)
+{
+		for (int i = 0; i < 7; i++) {
+    pData_sensor[i] = ((((int16_t)tempReg_sensor[i * 2 + 1]) << 8) + (int16_t)tempReg_sensor[i * 2]);
+		}
+	sensor_saw_data.gyro[0]=pData_sensor[1];
+	sensor_saw_data.gyro[1]=pData_sensor[2];
+	sensor_saw_data.gyro[2]=pData_sensor[3];
+	sensor_saw_data.acc[0]=pData_sensor[4];
+  sensor_saw_data.acc[1]=	pData_sensor[5];
+	sensor_saw_data.acc[2]=pData_sensor[6];
+	
+ 	sensor_data.gyro[0] = -((float)(pData_sensor[1]-MyOffset.A_X)   / 32768 * 2000);
+  sensor_data.gyro[1] = ((float)(pData_sensor[2]-MyOffset.A_Y) / 32768* 2000);
+  sensor_data.gyro[2] = -((float)(pData_sensor[3]-MyOffset.A_Z)  / 32768 * 2000 );
+  sensor_data.acc[0] = -(float)pData_sensor[4];
+  sensor_data.acc[1] = (float)pData_sensor[5] ;
+  sensor_data.acc[2] = -(float)pData_sensor[6] ;
+	
+	//	MahonyAHRSupdate(quat, 1.0f/416,sensor_data.gyro[0]* 3.141592f/180.0f,sensor_data.gyro[1] * 3.141592f/180.0f,sensor_data.gyro[2]* 3.141592f/180.0f,sensor_data.acc[0],sensor_data.acc[1],sensor_data.acc[2],0,0,0);
+	MahonyAHRSupdateIMU(quat, 1.0f/416,sensor_data.gyro[0]* 3.141592f/180.0f,sensor_data.gyro[1] * 3.141592f/180.0f,sensor_data.gyro[2]* 3.141592f/180.0f,sensor_data.acc[0],sensor_data.acc[1],sensor_data.acc[2]);
+ 	
+  sensor_euler_angle.pitch = atan2(2 *(quat[2] * quat[3] + quat[0] * quat[1]) , quat[0] * quat[0] -quat[1] * quat[1] -quat[2] * quat[2] + quat[3] * quat[3])*57.295646f; 
+	//sensor_euler_angle.roll=asin(-2*(quat[1]*quat[3]-quat[0]*quat[2]))*57.295646f;
+	//sensor_euler_angle.yaw=atan2(2*(quat[1] * quat[2] + quat[0] * quat[3]) , quat[0] * quat[0] +quat[1] * quat[1] -quat[2] * quat[2] - quat[3] * quat[3])*57.295646f; 	
+		
+}
+
+void getYaw(int Samp){
+	
+		static float quat[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+	 sensor_data.mag[0] = (float)(MData[0]-MyOffset.M_X);
+  sensor_data.mag[1] = (float)(MData[1]-MyOffset.M_Y);
+  sensor_data.mag[2] = (float)(MData[2]-MyOffset.M_Z);
+MahonyAHRSupdate(quat, Samp/1000.0f,-sensor_data.gyro[0]* 3.141592f/180.0f,sensor_data.gyro[1] * 3.141592f/180.0f,-sensor_data.gyro[2]* 3.141592f/180.0f,-sensor_data.acc[0],sensor_data.acc[1],-sensor_data.acc[2],-sensor_data.mag[1],-sensor_data.mag[0],sensor_data.mag[2]);
+//MadgwickAHRSupdate(quat, Samp/1000.0f,-sensor_data.gyro[0]* 3.141592f/180.0f,sensor_data.gyro[1] * 3.141592f/180.0f,-sensor_data.gyro[2]* 3.141592f/180.0f,-sensor_data.acc[0],sensor_data.acc[1],-sensor_data.acc[2],sensor_data.mag[1]*-1,sensor_data.mag[0]*-1,sensor_data.mag[2]);
+
+	sensor_euler_angle.yaw=atan2(2*(quat[1] * quat[2] + quat[0] * quat[3]) , quat[0] * quat[0] +quat[1] * quat[1] -quat[2] * quat[2] - quat[3] * quat[3])*57.295646f; 	
+	
+}
+
+
+	void imu_sensor_read_data_from_fifo_DMA(void)
+{
+	LSM6DS3_IO_Read_DMA(tempReg_sensor, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_DATA_OUT_L, 14) ;
+	
+}
+void Calibration_Gyro(void)
+{
+	static uint16_t Calibration_Gyro_Cnt=0;
+	static int32_t Calibration_Gyro_Sum[3]={0,0,0};
+	if(Calibration_Gyro_Cnt<2000){
+		Calibration_Gyro_Sum[0]+=sensor_saw_data.gyro[0];
+		Calibration_Gyro_Sum[1]+=sensor_saw_data.gyro[1];
+		Calibration_Gyro_Sum[2]+=sensor_saw_data.gyro[2];
+	}
+	else{
+		MyOffset.G_X=Calibration_Gyro_Sum[0]/2000;
+		MyOffset.G_Y=Calibration_Gyro_Sum[1]/2000;
+		MyOffset.G_Z=Calibration_Gyro_Sum[2]/2000;
+		isCalib=1;
+	}
+	Calibration_Gyro_Cnt++;
+	
+}
+
+
+#ifdef I2C_DMA_MODE
+void imu_sensor_dma_read_call_back(void)
+{
+	get_euler();
+	
+	Car_Control();
+	
+}
+#endif
+imu_status_t my_imu_sensor_read_data_from_fifo(imu_sensor_raw_data_t* Sensor_Raw_Data,imu_sensor_data_t* Sensor_Data,imu_euler_data_t* Sensor_Euler_Angle)
+{
+  
+  int16_t pData[12] = {0};
+  uint8_t tempReg[14] = {0, 0};
+	
+  static imu_sensor_data_t sensor_data = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+	static imu_sensor_raw_data_t sensor_raw_data={0,0,0,0,0,0,0,0,0};
+	static imu_euler_data_t euler_angle={0,0,0};
+
+ LSM6DS3_IO_Read(tempReg, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_DATA_OUT_L, 14) ;
+		for (int i = 0; i < 7; i++) {
+    pData[i] = ((((int16_t)tempReg[i * 2 + 1]) << 8) + (int16_t)tempReg[i * 2]);
+  }
+
+	sensor_raw_data.gyro[0]=pData[1];
+	sensor_raw_data.gyro[1]=pData[2];
+	sensor_raw_data.gyro[2]=pData[3];
+	sensor_raw_data.acc[0]=pData[4];
+  sensor_raw_data.acc[1]=	pData[5];
+	sensor_raw_data.acc[2]=pData[6];
+  
+	
+	sensor_data.gyro[0] = -((float)(pData[1]-MyOffset.A_X)   / 32768 * 2000);
+  sensor_data.gyro[1] = ((float)(pData[2]-MyOffset.A_Y) / 32768* 2000);
+  sensor_data.gyro[2] = -((float)(pData[3]-MyOffset.A_Z)  / 32768 * 2000 );
+  sensor_data.acc[0] = -(float)pData[4];
+  sensor_data.acc[1] = (float)pData[5] ;
+  sensor_data.acc[2] = -(float)pData[6] ;
+	
+
+	
+	MahonyAHRSupdate(quat, 1.0f/416,sensor_data.gyro[0]* 3.141592f/180.0f,sensor_data.gyro[1] * 3.141592f/180.0f,sensor_data.gyro[2]* 3.141592f/180.0f,sensor_data.acc[0],sensor_data.acc[1],sensor_data.acc[2],0,0,0);
+	
+  euler_angle.pitch = atan2(2 *(quat[2] * quat[3] + quat[0] * quat[1]) , quat[0] * quat[0] -quat[1] * quat[1] -quat[2] * quat[2] + quat[3] * quat[3])*57.295646f; 
+	euler_angle.roll=asin(-2*(quat[1]*quat[3]-quat[0]*quat[2]))*57.295646f;
+	euler_angle.yaw=atan2(2*(quat[1] * quat[2] + quat[0] * quat[3]) , quat[0] * quat[0] +quat[1] * quat[1] -quat[2] * quat[2] - quat[3] * quat[3])*57.295646f; 
+	
+	*Sensor_Data=sensor_data;
+	*Sensor_Raw_Data=sensor_raw_data;
+	*Sensor_Euler_Angle=euler_angle;
+	
+	return imu_status_ok;
 }
 
 #ifdef LSM6DS3_THRESHOLD
@@ -773,4 +955,18 @@ static imu_status_t  imu_sensor_gyro_get_sensitivity( float *pfData )
 
     return imu_status_ok;
 }
+static uint16_t imu_sensor_get_fifo_datalength(void)
+{
+  uint8_t fifo_1_number = 0;
+
+
+  if (LSM6DS3_IO_Read(&fifo_1_number, LSM6DS3_XG_MEMS_ADDRESS, LSM6DS3_XG_FIFO_STATUS1, 1) != imu_status_ok)
+  {
+    return imu_status_fail;
+  }
+	return fifo_1_number;
+}
+
+
+
 

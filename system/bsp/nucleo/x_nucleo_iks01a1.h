@@ -116,7 +116,8 @@ typedef struct
 #endif /* CANNON_V1 */
 
 #if (defined (CANNON_V2))
-#define NUCLEO_I2C_EXPBD_SPEED                         400000
+#define NUCLEO_I2C_EXPBD_SPEED_LSM6DS3                         1000000
+//#define NUCLEO_I2C_EXPBD_SPEED_LSM6DS3                         400000
 #endif /* CANNON_V2 */
 
 
@@ -180,27 +181,13 @@ typedef struct
 #define IMU_6AXES_INT1_EXTI_IRQn           EXTI0_IRQn
 #endif
 
-
-//#define MAGNETO_DRDY_GPIO_PORT           GPIOB
-//#define MAGNETO_DRDY_GPIO_CLK_ENABLE()   __GPIOB_CLK_ENABLE()
-//#define MAGNETO_DRDY_GPIO_CLK_DISABLE()  __GPIOB_CLK_DISABLE()
-//#define MAGNETO_DRDY_PIN                 GPIO_PIN_5
-
-//#if ((defined (USE_STM32F4XX_NUCLEO)) || (defined (USE_STM32L1XX_NUCLEO)))
-//#define MAGNETO_DRDY_EXTI_IRQn           EXTI9_5_IRQn
-//#endif
-
-//#if (defined (USE_STM32L0XX_NUCLEO))
-//#define MAGNETO_DRDY_EXTI_IRQn           EXTI0_1_IRQn
-//#endif
-
 #define MAGNETO_INT1_GPIO_PORT           GPIOB
 #define MAGNETO_INT1_GPIO_CLK_ENABLE()   __GPIOB_CLK_ENABLE()
 #define MAGNETO_INT1_GPIO_CLK_DISABLE()  __GPIOB_CLK_DISABLE()
 #define MAGNETO_INT1_PIN                 GPIO_PIN_5
 
 #if (defined (CANNON_V2))
-#define MAGNETO_INT1_EXTI_IRQn           EXTI1_IRQn
+#define MAGNETO_INT1_EXTI_IRQn           EXTI9_5_IRQn
 #endif
 
 
@@ -294,6 +281,15 @@ typedef struct
    You may modify these timeout values depending on CPU frequency and application
    conditions (interrupts routines ...). */   
 #define LSM6DS3_SPIx_TIMEOUT_MAX									1000
+
+#ifdef I2C_DMA_MODE
+/*************************************************************DMA**************************************************************************************/
+#define DMA_STREAM               DMA1_Stream0
+#define DMA_CHANNEL              DMA_CHANNEL_1 
+#define DMA_STREAM_IRQ           DMA1_Stream0_IRQn
+#define DMA_STREAM_IRQHANDLER    DMA1_Stream0_IRQHandler
+
+#endif
 /**
   * @}
   */

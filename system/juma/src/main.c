@@ -45,15 +45,14 @@
 #include "bluenrg_sdk_api.h"
 #include "bluenrg_sdk_host_api.h"
 #include "stm32f401_lp_mode.h"
-#include "dispatch.h"
+//#include "dispatch.h"
 #include "stm32f4xx_hal_msp.h"
 #include "juma_sensor.h"
+#include "cmsis_os.h"
 
 extern uint32_t sleep_time;
 __IO uint32_t uwCounter = 0;
 
-static void send_acc_data(void * args);
-static void send_test_data(void * args);
 
 /** @addtogroup X-CUBE-BLE1_Applications
  *  @{
@@ -132,6 +131,9 @@ uint32_t stime ;
 
 int main(void)
 {
+	
+
+	
     /* STM32Cube HAL library initialization:
      *  - Configure the Flash prefetch, Flash preread and Buffer caches
      *  - Systick timer is configured by default as source of time base, but user
@@ -146,45 +148,57 @@ int main(void)
     /* Configure the system clock */
     SystemClock_Config();
     /* Configure LED0 */
-    BSP_LED_Init(LED0);
+ //   BSP_LED_Init(LED0);
     /*UART2 init*/
     UART_Init();
-    HAL_Delay(1000);
+   // HAL_Delay(100);
     /*sensor layer init*/
     #ifndef SENSOR_FIFO
       jsensor_sys_init();
     #endif
-    /* Initialize the BlueNRG SPI driver */
-    BNRG_SPI_Init();
+		
+ 	 /* Initialize the BlueNRG SPI driver */
+  // BNRG_SPI_Init();
     /* Initialize the BlueNRG HCI */
-    HCI_Init();
+  // HCI_Init();
     /* Reset BlueNRG hardware */
-    BlueNRG_RST();
+  //  BlueNRG_RST();
     /*Gatt And Gap Init*/
-    ble_init_bluenrg();
+ //  ble_init_bluenrg();
+
+		
+   
     /* Enable Power Clock */
     __HAL_RCC_PWR_CLK_ENABLE();
 
-    rtc_init();
-    dispatch_init();
+
+
+
+  //  rtc_init();
+  //  dispatch_init();
     //send_acc_data(NULL);
 		
     on_ready();
 		
+		while(1);
+
+		
+	/*	
     while(1)
     {
         HCI_Process();
         if(Ble_conn_state) {
             Ble_conn_state = BLE_NOCONNECTABLE;
         }
-        dispatch();
+   //     dispatch();
 //        if(sleep_flag == 1) {
 //            StopMode_Measure();
 //        }
 
     }
+		*/
 }
-
+/*
 static void send_acc_data(void * args)
 {
 
@@ -205,11 +219,11 @@ void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *hrtc)
 
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-    /* Turn LED0 on: Alarm generation */
+
     BSP_LED_On(LED0);
 }
 
-
+*/
 void sleep_flag_set(uint8_t flag)
 {
     sleep_flag = flag;
